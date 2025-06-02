@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖IT Demo - Specific Information When Needed</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .chat-interface {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .chat-input-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #3498db;
+        }
+
+        .quick-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .question-btn {
+            background: white;
+            border: 2px solid #3498db;
+            color: #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .question-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .response-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .response-container.active {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .smart-link {
+            text-decoration: underline;
+            position: relative;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .i-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            font-size: 11px;
+            font-style: italic;
+            font-weight: bold;
+            margin-left: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            top: -2px;
+        }
+
+        .i-indicator:hover {
+            transform: scale(1.2);
+            background: #c0392b;
+        }
+
+        .smartlink-popup {
+            position: fixed;
+            background: white;
+            width: 500px;
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+        }
+
+        .smartlink-popup.active {
+            display: block;
+            animation: popupIn 0.3s ease-out;
+        }
+
+        @keyframes popupIn {
+            from { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .popup-header {
+            background: #3498db;
+            color: white;
+            padding: 20px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            flex-grow: 1;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .notes-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .notes-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .notes-btn.active {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .popup-content {
+            padding: 25px;
+            max-height: 60vh;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .notes-section {
+            border-top: 2px solid #f1f1f1;
+            padding: 20px 25px;
+            background: #f8f9fa;
+            display: none;
+        }
+
+        .notes-section.active {
+            display: block;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .notes-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .add-note-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .add-note-btn:hover {
+            background: #2980b9;
+        }
+
+        .note-input-area {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        .note-input-area.active {
+            display: block;
+        }
+
+        .note-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .save-note-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .cancel-note-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .notes-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .note-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .note-meta {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .note-content {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .no-notes {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .meta-note {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .highlight-box {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .quick-questions { grid-template-columns: 1fr; }
+            .smartlink-popup { width: 95vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="header">
+            <h1>🤖IT Education Demo</h1>
+            <p>"Specific information readily available when needed"</p>
+        </div>
+        
+        <div class="chat-interface">
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Ask 🤖IT anything about school procedures..." id="chatInput">
+            </div>
+            
+            <div class="quick-questions">
+                <button class="question-btn" onclick="askQuestion('relief-teacher')">New relief teacher arrived - what do they need?</button>
+                <button class="question-btn" onclick="askQuestion('student-injury')">Student injured in playground - procedure?</button>
+                <button class="question-btn" onclick="askQuestion('parent-complaint')">Parent complaint about homework policy</button>
+                <button class="question-btn" onclick="askQuestion('fire-drill')">Fire drill procedure for Block C</button>
+            </div>
+
+            <!-- Relief Teacher Response -->
+            <div id="relief-teacher-response" class="response-container">
+                <h3>🤖IT Response: Relief Teacher Setup</h3>
+                <p><strong>Immediate actions for new relief teacher:</strong></p>
+                <p>Welcome! Please complete these steps: First, collect your <span class="smart-link" onclick="showPopup('visitor-badge')">visitor badge and building access<span class="i-indicator">i</span></span> from the main office. Review today's <span class="smart-link" onclick="showPopup('class-schedule')">class schedule and lesson plans<span class="i-indicator">i</span></span> with the coordinator. Access <span class="smart-link" onclick="showPopup('emergency-procedures')">emergency procedures and evacuation routes<span class="i-indicator">i</span></span> for your assigned areas. Key contacts include <span class="smart-link" onclick="showPopup('key-contacts')">duty coordinator and first aid officer<span class="i-indicator">i</span></span>.</p>
+                
+                <div class="meta-note">
+                    <strong>🔧 Development Note:</strong> This response demonstrates how 🤖IT provides comprehensive guidance with SmartLinks to detailed procedures. The <span class="smart-link" onclick="showPopup('tech-architecture')">technical architecture<span class="i-indicator">i</span></span> and <span class="smart-link" onclick="showPopup('implementation-plan')">implementation approach<span class="i-indicator">i</span></span> for your Vic Department work are embedded throughout this demo.
+                </div>
+            </div>
+
+            <!-- Student Injury Response -->
+            <div id="student-injury-response" class="response-container">
+                <h3>🤖IT Response: Student Injury Procedure</h3>
+                <p><strong>Immediate response protocol:</strong></p>
+                <p>Ensure student safety first. If serious injury, call <span class="smart-link" onclick="showPopup('emergency-contacts')">emergency services immediately<span class="i-indicator">i</span></span>. For minor injuries, escort to <span class="smart-link" onclick="showPopup('first-aid-room')">first aid room and notify trained officer<span class="i-indicator">i</span></span>. Complete <span class="smart-link" onclick="showPopup('incident-report')">mandatory incident report within 24 hours<span class="i-indicator">i</span></span>. Notify <span class="smart-link" onclick="showPopup('parent-notification')">parents using approved communication protocol<span class="i-indicator">i</span></span>.</p>
+                
+                <div class="meta-note">
+                    <strong>🔧 Development Note:</strong> This shows how 🤖IT handles time-critical scenarios with prioritized information. Perfect for <span class="smart-link" onclick="showPopup('scalability-model')">scaling across multiple Victorian schools<span class="i-indicator">i</span></span> with consistent procedures.
+                </div>
+            </div>
+
+            <!-- Parent Complaint Response -->
+            <div id="parent-complaint-response" class="response-container">
+                <h3>🤖IT Response: Parent Complaint Protocol</h3>
+                <p><strong>Professional complaint handling process:</strong></p>
+                <p>Listen actively and document concerns using <span class="smart-link" onclick="showPopup('complaint-form')">standard complaint recording form<span class="i-indicator">i</span></span>. Review current <span class="smart-link" onclick="showPopup('homework-policy')">homework policy and implementation guidelines<span class="i-indicator">i</span></span>. Schedule follow-up meeting within <span class="smart-link" onclick="showPopup('response-timeframes')">48 hours as per department standards<span class="i-indicator">i</span></span>. Escalate to <span class="smart-link" onclick="showPopup('escalation-process')">assistant principal if policy interpretation required<span class="i-indicator">i</span></span>.</p>
+                
+                <div class="meta-note">
+                    <strong>🔧 Development Note:</strong> Demonstrates how 🤖IT ensures consistent, compliant responses across all staff. The <span class="smart-link" onclick="showPopup('integration-capabilities')">system integration potential<span class="i-indicator">i</span></span> allows connection to existing student management systems.
+                </div>
+            </div>
+
+            <!-- Fire Drill Response -->
+            <div id="fire-drill-response" class="response-container">
+                <h3>🤖IT Response: Fire Drill - Block C</h3>
+                <p><strong>Block C evacuation procedure:</strong></p>
+                <p>Alert all occupants immediately. Direct students to <span class="smart-link" onclick="showPopup('evacuation-routes')">nearest emergency exit (eastern stairwell for upper floors)<span class="i-indicator">i</span></span>. Proceed to <span class="smart-link" onclick="showPopup('assembly-point')">designated assembly point at oval northern boundary<span class="i-indicator">i</span></span>. Conduct <span class="smart-link" onclick="showPopup('roll-call')">roll call using class lists from evacuation folder<span class="i-indicator">i</span></span>. Report attendance to <span class="smart-link" onclick="showPopup('fire-wardens')">fire warden stationed at assembly point<span class="i-indicator">i</span></span>.</p>
+                
+                <div class="meta-note">
+                    <strong>🔧 Development Note:</strong> Location-specific responses demonstrate 🤖IT's contextual intelligence. This <span class="smart-link" onclick="showPopup('deployment-strategy')">flexible deployment approach<span class="i-indicator">i</span></span> works for any stage of your current project timeline.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- SmartLink Popups -->
+
+    <!-- Education Content Popups -->
+    <div id="visitor-badge-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Visitor Badge & Building Access</div>
+            <div class="header-buttons">
+                <button class="notes-btn" onclick="toggleNotes('visitor-badge')" title="View/Add Notes">📝</button>
+                <button class="close-btn" onclick="closePopup()">&times;</button>
+            </div>
+        </div>
+        <div class="popup-content">
+            <p><strong>Main Office Location:</strong> Ground floor, Block A, Room 101</p>
+            <p><strong>Required Items:</strong></p>
+            <ul>
+                <li>Valid photo ID (driver's license or passport)</li>
+                <li>Relief teacher confirmation email</li>
+                <li>Emergency contact details</li>
+            </ul>
+            <p><strong>Access Codes Today:</strong></p>
+            <ul>
+                <li>Staff room: #4829</li>
+                <li>Resource room: #7394</li>
+                <li>Your assigned classroom: See coordinator</li>
+            </ul>
+            <div class="highlight-box">
+                <strong>🔧 Development Insight:</strong> This type of detailed, up-to-date information is exactly what gets scattered across systems. 🤖IT centralizes and organizes it instantly.
+            </div>
+        </div>
+        <div class="notes-section" id="visitor-badge-notes">
+            <div class="notes-header">
+                <div class="notes-title">Staff Notes & Updates</div>
+                <button class="add-note-btn" onclick="showNoteInput('visitor-badge')">+ Add Note</button>
+            </div>
+            
+            <div class="note-input-area" id="visitor-badge-input">
+                <textarea class="note-input" placeholder="Add a quick note about access procedures, issues, or updates... (max 200 characters)" maxlength="200"></textarea>
+                <div class="note-actions">
+                    <button class="save-note-btn" onclick="saveNote('visitor-badge')">Save</button>
+                    <button class="cancel-note-btn" onclick="cancelNote('visitor-badge')">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="notes-list" id="visitor-badge-list">
+                <div class="note-item">
+                    <div class="note-meta">Sarah M. - Oct 16, 2:30 PM</div>
+                    <div class="note-content">New security system installed - all relief teachers now need photo taken for temporary access card</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-meta">David C. - Oct 15, 8:45 AM</div>
+                    <div class="note-content">Office printer down - relief teacher forms need to be filled by hand today</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-meta">Admin - Oct 12, 4:00 PM</div>
+                    <div class="note-content">Staff room code changed due to security update. New code effective Monday.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="class-schedule-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Today's Schedule & Lesson Plans</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Your Classes Today:</strong></p>
+            <ul>
+                <li><strong>Period 1-2 (9:00-10:30):</strong> Year 8 Science - Room 205
+                    <br><em>Topic: States of Matter - Equipment in cupboard B3</em></li>
+                <li><strong>Period 3 (11:00-12:00):</strong> Year 9 Science - Room 205
+                    <br><em>Topic: Chemical Reactions - Safety demo required</em></li>
+                <li><strong>Period 5-6 (1:30-3:00):</strong> Year 7 Science - Room 203
+                    <br><em>Topic: Living Systems - Microscope activity</em></li>
+            </ul>
+            <p><strong>Lesson plans located:</strong> Teacher's desk, top drawer (laminated sheets)</p>
+            <p><strong>Emergency lesson backup:</strong> Science general activities folder on bookshelf</p>
+        </div>
+    </div>
+
+    <div id="emergency-procedures-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Emergency Procedures & Evacuation</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Your Areas Today:</strong> Block B (Rooms 203, 205)</p>
+            <p><strong>Evacuation Routes:</strong></p>
+            <ul>
+                <li>Room 203: Exit via eastern corridor to external stairs</li>
+                <li>Room 205: Exit via main corridor to central stairwell</li>
+            </ul>
+            <p><strong>Assembly Point:</strong> School oval, northern boundary near cricket nets</p>
+            <p><strong>Emergency Signals:</strong></p>
+            <ul>
+                <li>Fire alarm: Continuous siren</li>
+                <li>Lockdown: Three short blasts repeated</li>
+                <li>All clear: Single long tone</li>
+            </ul>
+            <p><strong>Class evacuation folders:</strong> Located next to classroom door</p>
+        </div>
+    </div>
+
+    <div id="key-contacts-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Key Contacts for Today</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Duty Coordinator:</strong> Sarah Mitchell - Ext. 234 (Mobile: 0412 555 789)</p>
+            <p><strong>First Aid Officer:</strong> David Chen - Ext. 156 (Located: Staff room)</p>
+            <p><strong>Science Coordinator:</strong> Emma Wilson - Ext. 267 (Room 210)</p>
+            <p><strong>Assistant Principal:</strong> Mark Thompson - Ext. 201 (Available: 10:30-11:00, 2:00-3:00)</p>
+            <p><strong>Emergency Contact:</strong> Office - Ext. 200 (Always staffed during school hours)</p>
+            <div class="highlight-box">
+                <strong>Note:</strong> All internal extensions can be dialed from any school phone. Mobile numbers for urgent situations only.
+            </div>
+        </div>
+    </div>
+
+    <!-- Development/Implementation Popups -->
+    <div id="tech-architecture-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">🤖IT Technical Architecture</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Core Technology Stack:</strong></p>
+            <ul>
+                <li><strong>AI Layer:</strong> Natural language processing for question interpretation</li>
+                <li><strong>SmartLinks Engine:</strong> Dynamic content organization and presentation</li>
+                <li><strong>Integration APIs:</strong> Connect to existing school management systems</li>
+                <li><strong>Security Framework:</strong> Role-based access and audit logging</li>
+            </ul>
+            <p><strong>Deployment Options:</strong></p>
+            <ul>
+                <li>Cloud-hosted SaaS for quick implementation</li>
+                <li>On-premise installation for data sovereignty</li>
+                <li>Hybrid approach for gradual migration</li>
+            </ul>
+            <div class="highlight-box">
+                <strong>For Vic Department:</strong> Government cloud compatibility ensures compliance with state IT policies and data protection requirements.
+            </div>
+        </div>
+    </div>
+
+    <div id="implementation-plan-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Implementation Approach for Education</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Phase 1: Foundation (Month 1-2)</strong></p>
+            <ul>
+                <li>Document mining from existing school procedures</li>
+                <li>Core question/answer pairs for common scenarios</li>
+                <li>Basic SmartLinks for essential information</li>
+                <li>Pilot with 2-3 key staff members</li>
+            </ul>
+            <p><strong>Phase 2: Expansion (Month 3-4)</strong></p>
+            <ul>
+                <li>Integration with student management systems</li>
+                <li>Role-based customization (teachers, admin, support)</li>
+                <li>Advanced SmartLinks with multimedia content</li>
+                <li>Staff training and feedback collection</li>
+            </ul>
+            <p><strong>Phase 3: Optimization (Month 5-6)</strong></p>
+            <ul>
+                <li>Usage analytics and improvement identification</li>
+                <li>Custom workflows for school-specific needs</li>
+                <li>Integration with external systems (DET databases)</li>
+                <li>Preparation for district-wide deployment</li>
+            </ul>
+            <div class="highlight-box">
+                <strong>Matt's Current Project:</strong> This timeline can accelerate or adapt based on where your Vic Department work currently stands.
+            </div>
+        </div>
+    </div>
+
+    <div id="scalability-model-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Victorian Schools Scalability Model</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Single School Success → District Deployment</strong></p>
+            <p><strong>Core Content Replication:</strong></p>
+            <ul>
+                <li>Standard DET policies automatically distributed</li>
+                <li>Common procedures shared across schools</li>
+                <li>Local customizations maintained per institution</li>
+                <li>Updates pushed from central administration</li>
+            </ul>
+            <p><strong>Government Efficiency Benefits:</strong></p>
+            <ul>
+                <li>Consistent procedure implementation across state</li>
+                <li>Reduced training costs for relief teachers</li>
+                <li>Improved compliance through standardized processes</li>
+                <li>Measurable efficiency gains for department reporting</li>
+            </ul>
+            <p><strong>Revenue Model for Partnership:</strong></p>
+            <ul>
+                <li>Per-school licensing for basic functionality</li>
+                <li>Premium features for advanced integration</li>
+                <li>Consulting services for implementation support</li>
+                <li>White-label opportunities for education consultants</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="integration-capabilities-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">System Integration Capabilities</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Student Management Systems:</strong></p>
+            <ul>
+                <li>CASES21 (Victorian standard)</li>
+                <li>Student attendance and academic records</li>
+                <li>Parent contact information</li>
+                <li>Individual learning plans and support needs</li>
+            </ul>
+            <p><strong>HR & Staff Systems:</strong></p>
+            <ul>
+                <li>Teacher qualifications and certifications</li>
+                <li>Relief teacher pool and availability</li>
+                <li>Professional development records</li>
+                <li>Leave management and coverage</li>
+            </ul>
+            <p><strong>Facilities & Resources:</strong></p>
+            <ul>
+                <li>Room booking and availability</li>
+                <li>Equipment maintenance schedules</li>
+                <li>Budget tracking and procurement</li>
+                <li>Incident reporting and follow-up</li>
+            </ul>
+            <div class="highlight-box">
+                <strong>Integration Advantage:</strong> Staff get comprehensive context from multiple systems through single 🤖IT queries, eliminating the need to check multiple platforms.
+            </div>
+        </div>
+    </div>
+
+    <div id="deployment-strategy-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Flexible Deployment Strategy</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Adapts to Your Current Project Stage:</strong></p>
+            
+            <p><strong>If Early Stage:</strong></p>
+            <ul>
+                <li>Focus on knowledge capture and organization</li>
+                <li>Document existing procedures efficiently</li>
+                <li>Create foundation for future system integration</li>
+                <li>Demonstrate quick wins to build support</li>
+            </ul>
+            
+            <p><strong>If Mid-Stage:</strong></p>
+            <ul>
+                <li>Enhance existing improvements with 🤖IT layer</li>
+                <li>Integrate with systems already being implemented</li>
+                <li>Accelerate user adoption through intuitive interface</li>
+                <li>Provide measurable efficiency improvements</li>
+            </ul>
+            
+            <p><strong>If Advanced Stage:</strong></p>
+            <ul>
+                <li>Add intelligence layer to completed systems</li>
+                <li>Optimize workflows based on usage patterns</li>
+                <li>Prepare for scaling to additional schools</li>
+                <li>Document success metrics for department reporting</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <strong>Partnership Approach:</strong> We build 🤖IT to complement and enhance your existing Vic Department work, not replace or compete with it.
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Education Popups -->
+    <div id="incident-report-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Incident Report Procedure</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Mandatory Reporting Requirements:</strong></p>
+            <ul>
+                <li>Complete Form 27B within 24 hours of incident</li>
+                <li>Include witness statements if available</li>
+                <li>Attach photos if relevant (injuries, hazards)</li>
+                <li>Submit to assistant principal for review</li>
+            </ul>
+            <p><strong>Form Location:</strong> Office reception (physical) or staff portal (digital)</p>
+            <p><strong>Required Information:</strong></p>
+            <ul>
+                <li>Date, time, and exact location of incident</li>
+                <li>Student(s) involved and their class</li>
+                <li>Description of injury or incident</li>
+                <li>First aid provided and by whom</li>
+                <li>Parent notification details</li>
+            </ul>
+            <p><strong>Follow-up Actions:</strong> Assistant principal will contact parents within 4 hours if injury required medical attention.</p>
+        </div>
+    </div>
+
+    <div id="emergency-contacts-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Emergency Services & Contacts</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Emergency Services:</strong></p>
+            <ul>
+                <li><strong>Police/Fire/Ambulance:</strong> 000</li>
+                <li><strong>Poison Information:</strong> 13 11 26</li>
+                <li><strong>Kids Helpline:</strong> 1800 55 1800</li>
+            </ul>
+            <p><strong>School Emergency Contacts:</strong></p>
+            <ul>
+                <li><strong>Principal:</strong> Direct line 03 9xxx 5001</li>
+                <li><strong>Assistant Principal:</strong> 03 9xxx 5002</li>
+                <li><strong>First Aid Coordinator:</strong> 03 9xxx 5156</li>
+                <li><strong>Facilities Manager:</strong> 03 9xxx 5089</li>
+            </ul>
+            <p><strong>After Hours Emergency:</strong> Principal mobile 0412 xxx 789</p>
+            <div class="highlight-box">
+                <strong>Critical Protocol:</strong> For serious injuries, call 000 first, then notify school administration.
+            </div>
+        </div>
+    </div>
+
+    <div id="first-aid-room-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">First Aid Room & Procedures</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Location:</strong> Block A, Ground Floor, Room 103 (next to main office)</p>
+            <p><strong>First Aid Officers Today:</strong></p>
+            <ul>
+                <li><strong>David Chen:</strong> 8:30am - 12:30pm (Level 2 certified)</li>
+                <li><strong>Sarah Mitchell:</strong> 12:30pm - 4:00pm (Level 2 certified)</li>
+                <li><strong>Emergency backup:</strong> Office staff (Level 1 certified)</li>
+            </ul>
+            <p><strong>Equipment Available:</strong></p>
+            <ul>
+                <li>Basic first aid supplies and bandages</li>
+                <li>Ice packs and heat packs</li>
+                <li>Emergency medication storage (EpiPens, inhalers)</li>
+                <li>Wheelchair and stretcher</li>
+                <li>AED (Automated External Defibrillator)</li>
+            </ul>
+            <p><strong>Student Rest Area:</strong> Beds available for students feeling unwell</p>
+            <div class="highlight-box">
+                <strong>Medication Policy:</strong> Only trained first aid officers can administer medication. Parents must provide written authorization.
+            </div>
+        </div>
+    </div>
+
+    <div id="parent-notification-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Parent Notification Protocol</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Immediate Notification Required For:</strong></p>
+            <ul>
+                <li>Any injury requiring medical attention</li>
+                <li>Head injuries (regardless of severity)</li>
+                <li>Student feeling unwell and requesting to go home</li>
+                <li>Behavioral incidents involving suspension</li>
+            </ul>
+            <p><strong>Contact Priority Order:</strong></p>
+            <ol>
+                <li>Primary emergency contact (usually parent/guardian)</li>
+                <li>Secondary emergency contact if primary unavailable</li>
+                <li>Authorized pickup persons if parents unavailable</li>
+            </ol>
+            <p><strong>Required Information:</strong></p>
+            <ul>
+                <li>Student name and class</li>
+                <li>Nature of incident/injury</li>
+                <li>First aid provided</li>
+                <li>Current student condition</li>
+                <li>Recommendation (home care, medical check, etc.)</li>
+            </ul>
+            <p><strong>Documentation:</strong> All parent contacts must be logged in student file with time, person contacted, and outcome.</p>
+        </div>
+    </div>
+
+    <div id="complaint-form-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Complaint Recording Form</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Complaint Form 15A - Required Fields:</strong></p>
+            <ul>
+                <li><strong>Date & Time:</strong> When complaint was received</li>
+                <li><strong>Parent/Guardian Details:</strong> Name, contact details, relationship to student</li>
+                <li><strong>Student Details:</strong> Name, year level, class</li>
+                <li><strong>Nature of Complaint:</strong> Academic, behavioral, policy, facility, staff conduct</li>
+                <li><strong>Specific Details:</strong> Factual description of concerns raised</li>
+                <li><strong>Desired Outcome:</strong> What the parent/guardian is seeking</li>
+            </ul>
+            <p><strong>Form Location:</strong></p>
+            <ul>
+                <li>Physical forms: Main office filing cabinet (top drawer)</li>
+                <li>Digital version: Staff portal under "Parent Relations"</li>
+                <li>Mobile access: School app admin section</li>
+            </ul>
+            <p><strong>Submission Process:</strong> Complete form within 24 hours, submit to year level coordinator, copy to assistant principal if policy-related.</p>
+        </div>
+    </div>
+
+    <div id="response-timeframes-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Response Timeframes & Standards</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Victorian Department Standards:</strong></p>
+            <ul>
+                <li><strong>Urgent Issues:</strong> Same day response (safety, welfare concerns)</li>
+                <li><strong>Formal Complaints:</strong> 48 hours acknowledgment, 10 days resolution</li>
+                <li><strong>Academic Concerns:</strong> 5 school days for initial response</li>
+                <li><strong>Policy Clarifications:</strong> 3 school days</li>
+                <li><strong>Facility Issues:</strong> 24 hours acknowledgment, action as per priority</li>
+            </ul>
+            <p><strong>Escalation Triggers:</strong></p>
+            <ul>
+                <li>Parent dissatisfied with initial response</li>
+                <li>Complaint involves staff conduct</li>
+                <li>Legal or policy interpretation required</li>
+                <li>Media attention or community concern</li>
+            </ul>
+            <p><strong>Documentation Requirements:</strong> All communications logged, response times tracked, outcome recorded for department reporting.</p>
+        </div>
+    </div>
+
+    <div id="escalation-process-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Complaint Escalation Process</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Escalation Pathway:</strong></p>
+            <ol>
+                <li><strong>Level 1:</strong> Subject teacher or relevant staff member</li>
+                <li><strong>Level 2:</strong> Year level coordinator or team leader</li>
+                <li><strong>Level 3:</strong> Assistant principal (policy interpretation)</li>
+                <li><strong>Level 4:</strong> Principal (serious concerns, staff conduct)</li>
+                <li><strong>Level 5:</strong> Regional education office (unresolved formal complaints)</li>
+            </ol>
+            <p><strong>When to Escalate Immediately:</strong></p>
+            <ul>
+                <li>Allegations of staff misconduct</li>
+                <li>Student safety concerns</li>
+                <li>Discrimination or harassment claims</li>
+                <li>Requests for policy exceptions</li>
+                <li>Threats of legal action or media involvement</li>
+            </ul>
+            <p><strong>Required Documentation:</strong> Each level must document decision rationale and actions taken before escalating.</p>
+        </div>
+    </div>
+
+    <div id="evacuation-routes-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Block C Evacuation Routes</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Block C Specific Routes:</strong></p>
+            <p><strong>Ground Floor (Rooms C01-C15):</strong></p>
+            <ul>
+                <li>Eastern exit: Direct to oval via equipment shed</li>
+                <li>Western exit: Via main corridor to front carpark (if eastern blocked)</li>
+            </ul>
+            <p><strong>First Floor (Rooms C16-C30):</strong></p>
+            <ul>
+                <li>Primary: Eastern stairwell to oval</li>
+                <li>Secondary: Western stairwell to front carpark</li>
+                <li>Emergency: Northern fire escape (external stairs)</li>
+            </ul>
+            <p><strong>Second Floor (Rooms C31-C45):</strong></p>
+            <ul>
+                <li>Primary: Eastern stairwell (never use lifts)</li>
+                <li>Secondary: Western stairwell if available</li>
+                <li>Emergency only: Northern fire escape</li>
+            </ul>
+            <p><strong>Special Considerations:</strong></p>
+            <ul>
+                <li>Science labs: Emergency shower areas have separate protocols</li>
+                <li>Computer labs: Shut down power at master switch if time permits</li>
+                <li>Students with mobility needs: Evacuation chairs located on each floor</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="assembly-point-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Assembly Point - Oval Northern Boundary</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Location Details:</strong></p>
+            <ul>
+                <li><strong>Primary Assembly:</strong> School oval, northern boundary near cricket nets</li>
+                <li><strong>Secondary Assembly:</strong> Front oval if primary compromised</li>
+                <li><strong>Emergency Alternative:</strong> Basketball courts (weather protection)</li>
+            </ul>
+            <p><strong>Class Organization:</strong></p>
+            <ul>
+                <li>Classes line up in year level groups</li>
+                <li>Teachers position at front of their class lines</li>
+                <li>Fire wardens stationed at designated points</li>
+                <li>Emergency services entry via main gate</li>
+            </ul>
+            <p><strong>Weather Contingencies:</strong></p>
+            <ul>
+                <li><strong>Rain/Storm:</strong> Move to covered basketball area</li>
+                <li><strong>Extreme Heat:</strong> Seek shade under trees (maintain organization)</li>
+                <li><strong>Severe Weather:</strong> Return to designated safe areas in buildings</li>
+            </ul>
+            <p><strong>Special Needs:</strong> Students requiring assistance gather near first aid station (southern end of assembly area).</p>
+        </div>
+    </div>
+
+    <div id="roll-call-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Roll Call Procedure</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Class Roll Call Process:</strong></p>
+            <ol>
+                <li>Use class list from evacuation folder (next to classroom door)</li>
+                <li>Call each student name clearly and mark attendance</li>
+                <li>Account for any students not in class at time of alarm</li>
+                <li>Note any students in sick bay, specialist classes, or excursions</li>
+                <li>Record total present and any missing students</li>
+            </ol>
+            <p><strong>Missing Student Protocol:</strong></p>
+            <ul>
+                <li>Immediately report missing students to fire warden</li>
+                <li>Provide last known location if known</li>
+                <li>DO NOT return to building to search</li>
+                <li>Fire warden coordinates with emergency services</li>
+            </ul>
+            <p><strong>Documentation:</strong></p>
+            <ul>
+                <li>Complete attendance on evacuation form</li>
+                <li>Submit to fire warden for consolidation</li>
+                <li>Maintain class supervision until all clear given</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="fire-wardens-popup" class="smartlink-popup">
+        <div class="popup-header">
+            <div class="popup-title">Fire Wardens & Emergency Coordinators</div>
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p><strong>Fire Wardens on Duty Today:</strong></p>
+            <ul>
+                <li><strong>Chief Fire Warden:</strong> Mark Thompson (Assistant Principal)</li>
+                <li><strong>Block A Warden:</strong> Sarah Mitchell (Admin Coordinator)</li>
+                <li><strong>Block B Warden:</strong> David Chen (Science Coordinator)</li>
+                <li><strong>Block C Warden:</strong> Emma Wilson (English Coordinator)</li>
+                <li><strong>Facilities Warden:</strong> James Baker (Maintenance)</li>
+            </ul>
+            <p><strong>Warden Responsibilities:</strong></p>
+            <ul>
+                <li>Coordinate evacuation for assigned areas</li>
+                <li>Collect attendance reports from teachers</li>
+                <li>Report to chief fire warden at assembly point</li>
+                <li>Liaise with emergency services upon arrival</li>
+                <li>Coordinate return to buildings when all clear given</li>
+            </ul>
+            <p><strong>Communication:</strong> Fire wardens carry two-way radios on emergency channel 3. Emergency services briefing area is main office parking area.</p>
+        </div>
+    </div>
+
+    <script>
+        function askQuestion(questionType) {
+            // Hide all response containers
+            const responses = document.querySelectorAll('.response-container');
+            responses.forEach(response => response.classList.remove('active'));
+            
+            // Show the specific response
+            const targetResponse = document.getElementById(questionType + '-response');
+            if (targetResponse) {
+                targetResponse.classList.add('active');
+                targetResponse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function showPopup(popupId) {
+            // Close any existing popups
+            closePopup();
+            
+            // Show overlay
+            document.getElementById('overlay').style.display = 'block';
+            
+            // Show specific popup
+            const popup = document.getElementById(popupId + '-popup');
+            if (popup) {
+                popup.classList.add('active');
+                console.log('Showing popup:', popupId);
+            } else {
+                console.error('Popup not found:', popupId + '-popup');
+                // List all available popups for debugging
+                const allPopups = document.querySelectorAll('.smartlink-popup');
+                console.log('Available popups:', Array.from(allPopups).map(p => p.id));
+            }
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup() {
+            // Hide overlay
+            document.getElementById('overlay').style.display = 'none';
+            
+            // Hide all popups
+            const popups = document.querySelectorAll('.smartlink-popup');
+            popups.forEach(popup => {
+                popup.classList.remove('active');
+            });
+            
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+
+        // Close popup when clicking overlay
+        document.getElementById('overlay').addEventListener('click', closePopup);
+
+        // Handle enter key in chat input
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.toLowerCase();
+                
+                // Simple keyword matching for demo
+                if (query.includes('relief') || query.includes('teacher')) {
+                    askQuestion('relief-teacher');
+                } else if (query.includes('injury') || query.includes('accident')) {
+                    askQuestion('student-injury');
+                } else if (query.includes('parent') || query.includes('complaint')) {
+                    askQuestion('parent-complaint');
+                } else if (query.includes('fire') || query.includes('drill')) {
+                    askQuestion('fire-drill');
+                } else {
+                    // Default to relief teacher for any other query
+                    askQuestion('relief-teacher');
+                }
+                
+                this.value = '';
+            }
+        });
+
+        function toggleNotes(popupId) {
+            const notesSection = document.getElementById(popupId + '-notes');
+            const notesBtn = document.querySelector(`#${popupId}-popup .notes-btn`);
+            
+            if (notesSection.classList.contains('active')) {
+                notesSection.classList.remove('active');
+                notesBtn.classList.remove('active');
+                // Close any open note input
+                cancelNote(popupId);
+            } else {
+                notesSection.classList.add('active');
+                notesBtn.classList.add('active');
+            }
+        }
+
+        function showNoteInput(popupId) {
+            const inputArea = document.getElementById(popupId + '-input');
+            const textarea = inputArea.querySelector('.note-input');
+            
+            inputArea.classList.add('active');
+            textarea.focus();
+        }
+
+        function cancelNote(popupId) {
+            const inputArea = document.getElementById(popupId + '-input');
+            const textarea = inputArea.querySelector('.note-input');
+            
+            inputArea.classList.remove('active');
+            textarea.value = '';
+        }
+
+        function saveNote(popupId) {
+            const inputArea = document.getElementById(popupId + '-input');
+            const textarea = inputArea.querySelector('.note-input');
+            const notesList = document.getElementById(popupId + '-list');
+            const noteText = textarea.value.trim();
+            
+            if (noteText === '') {
+                alert('Please enter a note before saving.');
+                return;
+            }
+            
+            // Create new note element
+            const noteItem = document.createElement('div');
+            noteItem.className = 'note-item';
+            
+            const now = new Date();
+            const timestamp = now.toLocaleDateString('en-AU', { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: 'numeric', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+            
+            noteItem.innerHTML = `
+                <div class="note-meta">You - ${timestamp}</div>
+                <div class="note-content">${noteText}</div>
+            `;
+            
+            // Add to top of notes list
+            notesList.insertBefore(noteItem, notesList.firstChild);
+            
+            // Clear and hide input
+            textarea.value = '';
+            inputArea.classList.remove('active');
+            
+            // Show success feedback
+            const saveBtn = inputArea.querySelector('.save-note-btn');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Saved!';
+            saveBtn.style.background = '#27ae60';
+            
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+                saveBtn.style.background = '#27ae60';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
